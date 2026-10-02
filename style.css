@@ -6,3 +6,8 @@ h1{font-size:2rem;line-height:1.2;margin:.2rem 0 .3rem}h2{font-size:1.2rem;margi
 p,li{margin:.4rem 0}a{color:var(--accent)}.muted{color:var(--muted);font-size:.9rem}
 nav{display:flex;gap:1rem;flex-wrap:wrap;font-size:.95rem;margin-bottom:1.5rem}
 .card{background:var(--card);border-radius:16px;padding:1rem 1.25rem;margin:.8rem 0}
+.hero{display:flex;gap:1.2rem;align-items:center;margin:.5rem 0 1.5rem}.hero img{width:96px;height:96px;border-radius:22px}
+.hero h1{margin:0}.lead{font-size:1.25rem;line-height:1.45;margin:.5rem 0 1.5rem}
+.shots{display:flex;gap:1rem;overflow-x:auto;padding:.5rem 0 1rem}.shots img{height:420px;border-radius:18px;box-shadow:0 4px 18px #0003;flex:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:.8rem}.badge{display:inline-block;background:var(--accent);color:var(--bg);padding:.6rem 1rem;border-radius:999px;font-weight:600}
+footer{margin-top:3rem;font-size:.9rem;color:var(--muted)}
