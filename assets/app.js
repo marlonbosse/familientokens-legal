@@ -85,23 +85,39 @@
     });
   }
 
-  // header state, hero tilt, parallax
+  // header state, hero tilt, parallax (only layers near the viewport; reads and writes are batched)
   const hero = d.querySelector(".hero-phone");
   const layers = [...d.querySelectorAll("[data-speed]")];
-  let ticking = false;
+  const parents = new Map();
+  const near = new Set();
+  let ticking = false, lastP = -1, stuck = false;
+  const schedule = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
   const update = () => {
     ticking = false;
     const y = scrollY, vh = innerHeight;
-    header?.classList.toggle("stuck", y > 12);
+    const nowStuck = y > 12;
+    if (nowStuck !== stuck) { stuck = nowStuck; header?.classList.toggle("stuck", stuck); }
     if (reduce) return;
-    hero?.style.setProperty("--p", clamp(y / (vh * 0.8), 0, 1).toFixed(3));
-    for (const el of layers) {
-      const r = (el.offsetParent || el.parentElement).getBoundingClientRect();
-      if (r.bottom < -400 || r.top > vh + 400) continue;
+    const p = clamp(y / (vh * 0.8), 0, 1);
+    if (hero && Math.abs(p - lastP) > 0.003) { lastP = p; hero.style.setProperty("--p", p.toFixed(3)); }
+    const reads = [];
+    for (const el of near) {
+      let host = parents.get(el);
+      if (!host) { host = el.offsetParent || el.parentElement; parents.set(el, host); }
+      reads.push([el, host.getBoundingClientRect()]);
+    }
+    for (const [el, r] of reads) {
       el.style.setProperty("--py", ((r.top + r.height / 2 - vh / 2) * parseFloat(el.dataset.speed)).toFixed(1) + "px");
     }
   };
-  addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
-  addEventListener("resize", update);
-  update();
+  if (!reduce) {
+    const layerIO = new IntersectionObserver((entries) => {
+      for (const e of entries) { if (e.isIntersecting) near.add(e.target); else near.delete(e.target); }
+      schedule();
+    }, { rootMargin: "300px 0px" });
+    layers.forEach((l) => layerIO.observe(l));
+  }
+  addEventListener("scroll", schedule, { passive: true });
+  addEventListener("resize", schedule);
+  schedule();
 })();
