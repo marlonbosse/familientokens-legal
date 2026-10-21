@@ -95,17 +95,20 @@
   const update = () => {
     ticking = false;
     const y = scrollY, vh = innerHeight;
+    // reads first, writes after: no forced layout
+    const reads = [];
+    if (!reduce) {
+      for (const el of near) {
+        let host = parents.get(el);
+        if (!host) { host = el.offsetParent || el.parentElement; parents.set(el, host); }
+        reads.push([el, host.getBoundingClientRect()]);
+      }
+    }
     const nowStuck = y > 12;
     if (nowStuck !== stuck) { stuck = nowStuck; header?.classList.toggle("stuck", stuck); }
     if (reduce) return;
     const p = clamp(y / (vh * 0.8), 0, 1);
     if (hero && Math.abs(p - lastP) > 0.003) { lastP = p; hero.style.setProperty("--p", p.toFixed(3)); }
-    const reads = [];
-    for (const el of near) {
-      let host = parents.get(el);
-      if (!host) { host = el.offsetParent || el.parentElement; parents.set(el, host); }
-      reads.push([el, host.getBoundingClientRect()]);
-    }
     for (const [el, r] of reads) {
       el.style.setProperty("--py", ((r.top + r.height / 2 - vh / 2) * parseFloat(el.dataset.speed)).toFixed(1) + "px");
     }
@@ -120,4 +123,14 @@
   addEventListener("scroll", schedule, { passive: true });
   addEventListener("resize", schedule);
   schedule();
+
+  // language suggestion: no redirect and nothing stored; shown only when the browser language fits the other page
+  const bar = d.querySelector(".langbar");
+  if (bar) {
+    const pref = String((navigator.languages && navigator.languages[0]) || navigator.language || "").toLowerCase();
+    const german = pref.startsWith("de");
+    const offer = bar.dataset.offer;
+    if (pref && ((offer === "en" && !german) || (offer === "de" && german))) bar.hidden = false;
+    bar.querySelector("button")?.addEventListener("click", () => { bar.hidden = true; });
+  }
 })();
