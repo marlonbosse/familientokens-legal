@@ -303,3 +303,8 @@ details p{color:var(--muted);margin-top:.8rem;max-width:42rem}
 @keyframes langin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @media(max-width:560px){.langbar{left:12px;right:12px;bottom:12px;max-width:none;justify-content:space-between}}
 @media(prefers-reduced-motion:reduce){.langbar{animation:none}}
+
+/* official Google Play badge (unaltered image, only sized) */
+.playbadge{display:inline-flex;border-radius:10px;transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.playbadge:hover{transform:translateY(-2px)}
+.playbadge img{height:56px;width:auto;display:block}
